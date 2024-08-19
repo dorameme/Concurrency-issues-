@@ -1,8 +1,15 @@
 package hello.stock.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import hello.stock.Service.StockService;
 import hello.stock.domain.Stock;
 import hello.stock.repository.StockRepository;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +38,25 @@ public class StockServiceTest {
     @Test
     public void 재고감소(){
         stockService.decrease(1L,1L);
-        Assertions.assertThat(stockRepository.findById(1L).orElseThrow().getQuantity()).isEqualTo(99);
+        assertThat(stockRepository.findById(1L).orElseThrow().getQuantity()).isEqualTo(99);
+    }
+
+    @Test
+    public void 동시에_요청_100개() throws InterruptedException {
+      int threadCount= 100;
+      ExecutorService executorService= Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    stockService.decrease(1L, 1L);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        Stock stock = stockRepository.findById(1L).orElseThrow();
+        assertEquals(0,stock.getQuantity());
     }
 }
