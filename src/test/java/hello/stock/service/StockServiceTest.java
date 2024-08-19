@@ -2,6 +2,7 @@ package com.example.stock.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import hello.stock.Service.PessimisticLockStockService;
 import hello.stock.Service.StockService;
 import hello.stock.StockApplication;
 import hello.stock.domain.Stock;
@@ -20,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class StockServiceTest {
 
     @Autowired
-    private  StockService stockService;
+    private PessimisticLockStockService stockService;
 
     @Autowired
     private  StockRepository stockRepository;

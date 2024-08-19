@@ -21,6 +21,11 @@ synchronized 로 해결가능할까? -> 실패!
 
 ## 2) database 
 ### 해결: 
-1) Pessimistic Lock
-2) Optimistic Lock 
-3) Named Lock
+1) Pessimistic Lock : 실제 데이터에 락을 걸어 점유하는 방식으로 정합성을 맞춘다.
+    쿼리 insert - for update 구문을 사용한다!
+    충돌이 빈번하면 Optimistic Lock보다 성능이 좋다.
+    락을 통해 업데이터를 제어하기 때문에 데이터 정합성이 보장된다.
+    별도로 락을 잡아서 성능 저하가 있을 수 있다.
+2) Optimistic Lock  :
+    
+3) Named Lock :
