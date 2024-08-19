@@ -2,6 +2,7 @@ package hello.stock.Service;
 
 import hello.stock.domain.Stock;
 import hello.stock.repository.StockRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,8 @@ public class StockService {
         this.stockRepository = stockRepository;
     }
 
-    public void decrease(Long id, Long quantity) {
+    @Transactional
+    public synchronized void decrease(Long id, Long quantity) {
         Stock stock = stockRepository.findById(id).orElseThrow();
         stock.decrease(quantity);
         stockRepository.saveAndFlush(stock);
