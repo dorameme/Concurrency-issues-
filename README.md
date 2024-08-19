@@ -45,7 +45,9 @@
 ## 4. Lettuce vs Redis 
 ### Lettuce
 1) setnx 명령어를 활용하여 분산락 구현
-2) spin lock 방식
+2) spin lock 방식 -> 자원 낭비가 심하다.
+3) 구현이 간단하다.
 
 ### Redis
-1) pub-sub 기반으로 lock구현 제공
+1) pub-sub 기반으로 lock구현 제공 
+2)  Named Lock과 유사하지만 세션관리에 신경쓸 필요가 없다는 점이 다름.
