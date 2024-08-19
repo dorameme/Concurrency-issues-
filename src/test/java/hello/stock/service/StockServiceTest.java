@@ -1,11 +1,12 @@
-package hello.stock.service;
+package com.example.stock.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hello.stock.Service.StockService;
+import hello.stock.StockApplication;
 import hello.stock.domain.Stock;
 import hello.stock.repository.StockRepository;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,35 +16,40 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-public class StockServiceTest {
-    @Autowired
-    private StockService stockService;
+@SpringBootTest(classes = StockApplication.class)
+class StockServiceTest {
 
     @Autowired
-    private StockRepository stockRepository;
+    private  StockService stockService;
+
+    @Autowired
+    private  StockRepository stockRepository;
 
     @BeforeEach
-    public void before(){
-        stockRepository.saveAndFlush(new Stock(1L,100L));
+    public void insert() {
+        Stock stock = new Stock(1L, 100L);
+
+        stockRepository.saveAndFlush(stock);
     }
 
     @AfterEach
-    public void after(){
+    public void delete() {
         stockRepository.deleteAll();
     }
 
     @Test
-    public void 재고감소(){
-        stockService.decrease(1L,1L);
-        assertThat(stockRepository.findById(1L).orElseThrow().getQuantity()).isEqualTo(99);
+    public void decrease_test() {
+        stockService.decrease(1L, 1L);
+        Stock stock = stockRepository.findById(1L).orElseThrow();
+        assertEquals(99, stock.getQuantity());
     }
 
     @Test
-    public void 동시에_요청_100개() throws InterruptedException {
-      int threadCount= 100;
-      ExecutorService executorService= Executors.newFixedThreadPool(32);
+    public void 동시에_100명이_주문() throws InterruptedException {
+        int threadCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch latch = new CountDownLatch(threadCount);
+
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
@@ -53,8 +59,11 @@ public class StockServiceTest {
                 }
             });
         }
+
         latch.await();
+
         Stock stock = stockRepository.findById(1L).orElseThrow();
-        assertEquals(0,stock.getQuantity());
+        // 100 - (100 * 1) = 0
+        assertEquals(0, stock.getQuantity());
     }
 }
